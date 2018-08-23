@@ -22,9 +22,15 @@ done
 
 HOSTNAMES=$(nslookup "${QUERY}" | grep "Address" | awk '{ print $3 }' | sed -e 's/^/http:\/\//' | sed -e "s/$/\/${VOLUME_PATH}/" | tr '\n' ' ' | sed -e 's/[ \t]*$//')
 
-# export secrets
-export MINIO_ACCESS_KEY=$(cat /run/secrets/MINIO_ACCESS_KEY)
-export MINIO_SECRET_KEY=$(cat /run/secrets/MINIO_SECRET_KEY)
+
+if [ -f "/run/secrets/$MINIO_ACCESS_KEY_FILE" ]
+then
+  export MINIO_ACCESS_KEY=$(cat /run/secrets/$MINIO_ACCESS_KEY_FILE)
+fi
+if [ -f "/run/secrets/$MINIO_SECRET_KEY_FILE" ]
+then
+  export MINIO_SECRET_KEY=$(cat /run/secrets/$MINIO_SECRET_KEY_FILE)
+fi
 
 # start server
 eval "minio server" "${HOSTNAMES}"
